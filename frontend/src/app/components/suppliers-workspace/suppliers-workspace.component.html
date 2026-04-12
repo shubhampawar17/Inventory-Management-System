@@ -1,0 +1,68 @@
+<section class="panel span-4 form-panel">
+  <div class="panel-header">
+    <div>
+      <p class="eyebrow">Vendor studio</p>
+      <h3>{{ supplierForm.supplierId ? 'Edit supplier' : 'Create supplier' }}</h3>
+    </div>
+  </div>
+
+  <form class="form-grid" (ngSubmit)="save.emit()">
+    <label class="field">
+      <span>Name</span>
+      <input [(ngModel)]="supplierForm.name" name="supplierName" placeholder="Metro Components" required />
+    </label>
+    <label class="field">
+      <span>Contact Information</span>
+      <input [(ngModel)]="supplierForm.contactInformation" name="supplierContactInformation" placeholder="ops@vendor.com" required />
+    </label>
+    <label class="field">
+      <span>Inventory</span>
+      <select [(ngModel)]="supplierForm.inventoryId" name="supplierInventoryId" required>
+        <option [ngValue]="0">Select inventory</option>
+        <option *ngFor="let inventory of inventories" [ngValue]="inventory.inventoryId">
+          {{ inventory.location }} (#{{ inventory.inventoryId }})
+        </option>
+      </select>
+    </label>
+    <div class="actions">
+      <button type="submit">{{ supplierForm.supplierId ? 'Update Supplier' : 'Create Supplier' }}</button>
+      <button type="button" class="ghost" (click)="reset.emit()">Clear</button>
+    </div>
+  </form>
+</section>
+
+<section class="panel span-8">
+  <div class="panel-header">
+    <div>
+      <p class="eyebrow">Supplier network</p>
+      <h3>Coverage and contact readiness</h3>
+    </div>
+    <span class="panel-meta">{{ supplierCoverage }}% inventory coverage</span>
+  </div>
+
+  <div class="filters">
+    <label class="field compact">
+      <span>Search</span>
+      <input [ngModel]="supplierSearchTerm" (ngModelChange)="supplierSearchTermChange.emit($event)" name="supplierSearchTerm" placeholder="Search suppliers or contacts" />
+    </label>
+  </div>
+
+  <div class="supplier-grid">
+    <article class="supplier-card" *ngFor="let card of cards">
+      <div class="supplier-head">
+        <strong>{{ card.name }}</strong>
+        <span>{{ card.inventoryLocation }}</span>
+      </div>
+      <p>{{ card.contactInformation }}</p>
+      <div class="row-actions">
+        <button type="button" class="ghost small" (click)="edit.emit({
+          supplierId: card.supplierId,
+          name: card.name,
+          contactInformation: card.contactInformation,
+          inventoryId: card.inventoryId
+        })">Edit</button>
+        <button type="button" class="danger small" (click)="delete.emit(card.supplierId)">Delete</button>
+      </div>
+    </article>
+  </div>
+</section>

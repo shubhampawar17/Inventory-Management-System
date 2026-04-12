@@ -1,0 +1,112 @@
+<section class="panel span-8">
+  <div class="panel-header">
+    <div>
+      <p class="eyebrow">Network health</p>
+      <h3>Warehouse snapshots</h3>
+    </div>
+    <span class="panel-meta">{{ summary.kpis.totalInventories }} active inventory nodes</span>
+  </div>
+
+  <div class="snapshot-grid">
+    <article class="snapshot-card" *ngFor="let warehouse of summary.inventorySnapshots">
+      <div class="snapshot-header">
+        <div class="snapshot-copy">
+          <strong>{{ warehouse.location }}</strong>
+        </div>
+        <span class="pill" [class.warning]="warehouse.healthLabel !== 'Stable'" [class.neutral]="warehouse.healthLabel === 'Idle'">
+          {{ warehouse.healthLabel }}
+        </span>
+      </div>
+      <div class="snapshot-metrics">
+        <div>
+          <span>Products</span>
+          <strong>{{ warehouse.productCount }}</strong>
+        </div>
+        <div>
+          <span>Suppliers</span>
+          <strong>{{ warehouse.supplierCount }}</strong>
+        </div>
+        <div>
+          <span>Units</span>
+          <strong>{{ warehouse.totalUnits }}</strong>
+        </div>
+        <div>
+          <span>Value</span>
+          <strong>{{ warehouse.stockValue | currency:'INR':'symbol':'1.0-0' }}</strong>
+        </div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section class="panel span-4">
+  <div class="panel-header">
+    <div>
+      <p class="eyebrow">Risk radar</p>
+      <h3>Replenishment watchlist</h3>
+    </div>
+  </div>
+
+  <div class="watchlist" *ngIf="summary.lowStockProducts.length; else noAlerts">
+    <article class="list-row" *ngFor="let product of summary.lowStockProducts">
+      <div class="list-copy">
+        <strong>{{ product.productName }}</strong>
+        <span>{{ product.inventoryLocation }}</span>
+      </div>
+      <div class="row-trailing">
+        <span class="severity" [class.critical]="product.quantity <= 5">{{ product.quantity }} units</span>
+        <button type="button" class="ghost small" (click)="stageTransaction.emit(product)">Restock</button>
+      </div>
+    </article>
+  </div>
+
+  <ng-template #noAlerts>
+    <div class="empty-state">
+      <strong>No low-stock alerts</strong>
+      <p>Your current catalog is above the replenishment threshold.</p>
+    </div>
+  </ng-template>
+</section>
+
+<section class="panel span-5">
+  <div class="panel-header">
+    <div>
+      <p class="eyebrow">Top exposure</p>
+      <h3>Highest value products</h3>
+    </div>
+  </div>
+
+  <div class="featured-list">
+    <article class="featured-row" *ngFor="let product of summary.topProducts">
+      <div class="featured-copy">
+        <strong>{{ product.productName }}</strong>
+        <span>{{ product.inventoryLocation }}</span>
+      </div>
+      <div class="featured-stats">
+        <span>{{ product.quantity }} units</span>
+        <strong>{{ product.exposureValue | currency:'INR':'symbol':'1.0-0' }}</strong>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section class="panel span-7">
+  <div class="panel-header">
+    <div>
+      <p class="eyebrow">Recent flow</p>
+      <h3>Latest inventory movements</h3>
+    </div>
+    <button type="button" class="ghost small" (click)="openMovements.emit()">Open movement desk</button>
+  </div>
+
+  <div class="timeline">
+    <article class="timeline-row" *ngFor="let transaction of summary.recentTransactions">
+      <div class="timeline-marker" [class.remove]="transaction.type === 'Remove'"></div>
+      <div class="timeline-copy">
+        <strong>{{ transaction.productName }}</strong>
+        <p>{{ transaction.type }} {{ transaction.quantity }} units at {{ transaction.inventoryLocation }}</p>
+      </div>
+      <time>{{ transaction.date | date:'MMM d, y, h:mm a' }}</time>
+    </article>
+  </div>
+</section>

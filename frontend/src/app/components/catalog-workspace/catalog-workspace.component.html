@@ -1,0 +1,94 @@
+<section class="panel span-4 form-panel">
+  <div class="panel-header">
+    <div>
+      <p class="eyebrow">Product studio</p>
+      <h3>{{ productForm.productId ? 'Edit product' : 'Create product' }}</h3>
+    </div>
+  </div>
+
+  <form class="form-grid" (ngSubmit)="save.emit()">
+    <label class="field">
+      <span>Name</span>
+      <input [(ngModel)]="productForm.name" name="productName" placeholder="Industrial scanner" required />
+    </label>
+    <label class="field">
+      <span>Description</span>
+      <input [(ngModel)]="productForm.description" name="productDescription" placeholder="Barcode-enabled device" required />
+    </label>
+    <label class="field">
+      <span>Quantity</span>
+      <input [(ngModel)]="productForm.quantity" name="productQuantity" type="number" min="0" required />
+    </label>
+    <label class="field">
+      <span>Price</span>
+      <input [(ngModel)]="productForm.price" name="productPrice" type="number" min="0" step="0.01" required />
+    </label>
+    <label class="field">
+      <span>Inventory</span>
+      <select [(ngModel)]="productForm.inventoryId" name="productInventoryId" required>
+        <option [ngValue]="0">Select inventory</option>
+        <option *ngFor="let inventory of inventories" [ngValue]="inventory.inventoryId">
+          {{ inventory.location }} (#{{ inventory.inventoryId }})
+        </option>
+      </select>
+    </label>
+    <div class="actions">
+      <button type="submit">{{ productForm.productId ? 'Update Product' : 'Create Product' }}</button>
+      <button type="button" class="ghost" (click)="reset.emit()">Clear</button>
+    </div>
+  </form>
+</section>
+
+<section class="panel span-8">
+  <div class="panel-header">
+    <div>
+      <p class="eyebrow">Product control tower</p>
+      <h3>Catalog performance</h3>
+    </div>
+  </div>
+
+  <div class="filters">
+    <label class="field compact">
+      <span>Search</span>
+      <input [ngModel]="productSearchTerm" (ngModelChange)="productSearchTermChange.emit($event)" name="productSearchTerm" placeholder="Search by SKU or description" />
+    </label>
+  </div>
+
+  <div class="table-shell">
+    <table>
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Status</th>
+          <th>Inventory</th>
+          <th>Units</th>
+          <th>Price</th>
+          <th>Exposure</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of rows" [class.newly-created]="row.productId === highlightedProductId">
+          <td>
+            <strong>{{ row.name }}</strong>
+            <small>{{ row.description }}</small>
+          </td>
+          <td>
+            <span class="pill" [class.warning]="row.status === 'watch'" [class.danger]="row.status === 'critical'">
+              {{ row.status }}
+            </span>
+          </td>
+          <td>{{ row.inventoryLocation }}</td>
+          <td>{{ row.quantity }}</td>
+          <td>{{ row.price | currency:'INR':'symbol':'1.2-2' }}</td>
+          <td>{{ row.exposureValue | currency:'INR':'symbol':'1.0-0' }}</td>
+          <td class="row-actions">
+            <button type="button" class="ghost small" (click)="onEdit(row)">Edit</button>
+            <button type="button" class="ghost small" (click)="onMove(row)">Move</button>
+            <button type="button" class="danger small" (click)="onDelete(row)">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>

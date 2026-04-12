@@ -1,0 +1,22 @@
+{
+  "folders": [
+    {
+      "name": "IMS-Frontend",
+      "path": "IMS/IMS-Frontend"
+    },
+    {
+      "name": "IMS-Backend",
+      "path": "IMS/IMS"
+    }
+  ],
+  "settings": {
+    "typescript.tsdk": "IMS/IMS-Frontend/node_modules/typescript/lib",
+    "angular.enable-strict-mode-prompt": false
+  },
+  "extensions": {
+    "recommendations": [
+      "angular.ng-template",
+      "ms-dotnettools.csharp"
+    ]
+  }
+}

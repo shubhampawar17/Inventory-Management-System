@@ -1,0 +1,19 @@
+:host {
+  display: contents;
+}
+
+.filters {
+  margin-bottom: 16px;
+}
+
+:host ::ng-deep tr.newly-created td {
+  background: rgba(240, 176, 79, 0.12);
+}
+
+:host ::ng-deep tr.newly-created td:first-child {
+  box-shadow: inset 4px 0 0 #f0b04f;
+}
+
+:host ::ng-deep tr.newly-created strong {
+  color: #ffe5b2;
+}

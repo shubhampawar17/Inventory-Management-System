@@ -1,0 +1,32 @@
+:host {
+  display: contents;
+}
+
+.brand-lockup {
+  display: inline-flex;
+  align-items: center;
+  color: #f7efe3;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.hero-stage-topbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 10px;
+}
+
+.hero-logout {
+  flex-shrink: 0;
+}
+
+@media (max-width: 760px) {
+  .hero-stage-topbar {
+    justify-content: flex-start;
+  }
+
+  .hero-logout {
+    align-self: flex-start;
+  }
+}

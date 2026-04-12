@@ -1,0 +1,88 @@
+<section class="hero-panel">
+  <div class="hero-copy">
+    <div class="brand-lockup">
+      <span>{{ brandTitle }}</span>
+    </div>
+    <p class="eyebrow">Portfolio-grade inventory experience</p>
+    <h1>{{ showcaseTitle }}</h1>
+    <p class="hero-text">
+      A modern operations workspace for inventory leadership, procurement coordination, and warehouse visibility.
+    </p>
+
+    <div class="hero-actions">
+      <button type="button" (click)="activeViewChange.emit('catalog')">Open catalog workspace</button>
+      <button type="button" class="ghost" (click)="activeViewChange.emit('movements')">Log stock movement</button>
+    </div>
+
+    <div class="hero-tags">
+      <span>Warehouse analytics</span>
+      <span>Supplier operations</span>
+      <span>Live stock controls</span>
+    </div>
+  </div>
+
+  <div class="hero-stage">
+    <div class="hero-stage-topbar">
+      <button type="button" class="ghost danger hero-logout" (click)="logout.emit()">Logout</button>
+    </div>
+    <div class="stage-card signal-card">
+      <span class="signal-kicker">Operational Pulse</span>
+      <strong>{{ operationalHeadline }}</strong>
+      <p>{{ operationalSubline }}</p>
+    </div>
+
+    <div class="stage-grid">
+      <article class="metric-card accent-amber">
+        <span>Total SKUs</span>
+        <strong>{{ summary.kpis.totalProducts }}</strong>
+        <small>{{ summary.kpis.totalUnits }} units across all inventories</small>
+      </article>
+      <article class="metric-card accent-blue">
+        <span>Inventory Value</span>
+        <strong>{{ summary.kpis.totalInventoryValue | currency:'INR':'symbol':'1.0-0' }}</strong>
+        <small>Gross stock exposure at current pricing</small>
+      </article>
+      <article class="metric-card accent-green">
+        <span>In-Stock Rate</span>
+        <strong>{{ summary.kpis.inStockRate }}%</strong>
+        <small>Products above {{ lowStockThreshold }} units</small>
+      </article>
+      <article class="metric-card accent-red">
+        <span>Low Stock Alerts</span>
+        <strong>{{ summary.kpis.lowStockCount }}</strong>
+        <small>SKUs needing replenishment planning</small>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="toolbar">
+  <div class="toolbar-copy">
+    <p class="eyebrow">Workspace</p>
+    <h2>Operations command view</h2>
+  </div>
+
+  <div class="toolbar-controls">
+    <label class="field compact">
+      <span>Inventory scope</span>
+      <select [ngModel]="inventoryFilterId" (ngModelChange)="inventoryFilterIdChange.emit($event)" name="inventoryFilterId">
+        <option value="all">All inventories</option>
+        <option *ngFor="let inventory of inventories" [value]="inventory.inventoryId">
+          {{ inventory.location }}
+        </option>
+      </select>
+    </label>
+    <button type="button" class="ghost" (click)="refresh.emit()">Refresh data</button>
+  </div>
+</section>
+
+<nav class="view-switcher" aria-label="Workspace views">
+  <button
+    *ngFor="let view of workspaceViews"
+    type="button"
+    [class.active]="activeView === view.key"
+    (click)="activeViewChange.emit(view.key)">
+    <span>{{ view.label }}</span>
+    <small>{{ view.description }}</small>
+  </button>
+</nav>

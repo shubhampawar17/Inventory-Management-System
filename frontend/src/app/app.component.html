@@ -1,0 +1,180 @@
+<div class="app-shell">
+  <section class="login-shell" *ngIf="!isAuthenticated">
+    <article class="login-showcase">
+      <p class="eyebrow">Inventory management system</p>
+      <h1>Run stock operations with one clear control tower.</h1>
+      <p class="hero-text">
+        Monitor inventory nodes, products, suppliers, and stock movements from one workspace built for day-to-day admin work.
+      </p>
+
+      <div class="login-showcase-grid">
+        <article class="login-feature-card">
+          <span>Live inventory</span>
+          <strong>Track stock across multiple locations</strong>
+        </article>
+        <article class="login-feature-card">
+          <span>Movement desk</span>
+          <strong>Post add and remove transactions quickly</strong>
+        </article>
+        <article class="login-feature-card">
+          <span>Supplier network</span>
+          <strong>Keep vendor contact details organized</strong>
+        </article>
+      </div>
+    </article>
+
+    <article class="login-panel">
+      <div class="login-panel-copy">
+        <p class="eyebrow">Secure login</p>
+        <h2>Welcome back</h2>
+        <p>Enter login, password, and captcha to open the inventory workspace.</p>
+      </div>
+
+      <form class="login-form" (ngSubmit)="login()">
+        <label class="field">
+          <span>Login</span>
+          <input [(ngModel)]="loginForm.username" name="username" placeholder="Enter username" required />
+        </label>
+
+        <label class="field">
+          <span>Password</span>
+          <input [(ngModel)]="loginForm.password" name="password" type="password" placeholder="Enter password" required />
+        </label>
+
+        <div class="field">
+          <span>Captcha</span>
+          <div class="captcha-box">{{ generatedCaptcha }}</div>
+        </div>
+
+        <label class="field">
+          <span>Enter captcha</span>
+          <input [(ngModel)]="loginForm.captchaInput" name="captchaInput" placeholder="Type the captcha" required />
+        </label>
+
+        <div class="login-actions">
+          <button type="submit">Login</button>
+          <button type="button" class="ghost" (click)="refreshCaptcha()">Refresh Captcha</button>
+        </div>
+
+        <p class="login-error" *ngIf="loginError">{{ loginError }}</p>
+         <!-- <p class="login-hint">Default seeded admin in database: <strong>admin</strong> / <strong>admin123</strong></p> -->
+      </form>
+    </article>
+  </section>
+
+  <ng-container *ngIf="isAuthenticated">
+  <app-workspace-header
+    [showcaseTitle]="showcaseTitle"
+    [brandTitle]="'IMS'"
+    [operationalHeadline]="operationalHeadline"
+    [operationalSubline]="operationalSubline"
+    [lowStockThreshold]="lowStockThreshold"
+    [summary]="dashboardSummary"
+    [inventories]="inventories"
+    [workspaceViews]="workspaceViews"
+    [activeView]="activeView"
+    [inventoryFilterId]="inventoryFilterId"
+    (activeViewChange)="setActiveView($event)"
+    (inventoryFilterIdChange)="inventoryFilterId = $event"
+    (refresh)="loadDashboard()"
+    (logout)="logout()">
+  </app-workspace-header>
+
+  <section class="message-dialog-backdrop" *ngIf="message">
+    <div class="message-dialog" [class.error]="messageType === 'error'">
+      <div class="message-dialog-icon" [class.error]="messageType === 'error'">
+        <span *ngIf="messageType === 'success'" class="message-icon-check"></span>
+        <span *ngIf="messageType === 'error'" class="message-icon-cross"></span>
+      </div>
+      <div class="message-dialog-copy">
+        <h3>{{ messageType === 'success' ? 'Success' : 'Error' }}</h3>
+        <p>{{ message }}</p>
+      </div>
+      <button type="button" class="small" (click)="closeMessageDialog()">OK</button>
+    </div>
+  </section>
+
+  <section class="loading-state" *ngIf="isLoading">
+    <div class="loading-orb"></div>
+    <p>Syncing inventory workspace...</p>
+  </section>
+
+  <main class="workspace-grid" *ngIf="!isLoading">
+    <app-overview-workspace
+      *ngIf="activeView === 'overview'"
+      [summary]="dashboardSummary"
+      (stageTransaction)="stageRestock($event)"
+      (openMovements)="setActiveView('movements')">
+    </app-overview-workspace>
+
+    <app-catalog-workspace
+      *ngIf="activeView === 'catalog'"
+      [productForm]="productForm"
+      [inventories]="inventories"
+      [productSearchTerm]="productSearchTerm"
+      [highlightedProductId]="highlightedProductId"
+      [rows]="filteredProductRows"
+      (productSearchTermChange)="productSearchTerm = $event"
+      (save)="saveProduct()"
+      (reset)="resetProductForm()"
+      (editProduct)="editProduct($event)"
+      (deleteProduct)="deleteProduct($event)"
+      (moveProduct)="stageTransaction($event)">
+    </app-catalog-workspace>
+
+    <app-suppliers-workspace
+      *ngIf="activeView === 'suppliers'"
+      [supplierForm]="supplierForm"
+      [inventories]="inventories"
+      [supplierCoverage]="dashboardSummary.kpis.supplierCoverage"
+      [supplierSearchTerm]="supplierSearchTerm"
+      [cards]="filteredSupplierCards"
+      (supplierSearchTermChange)="supplierSearchTerm = $event"
+      (save)="saveSupplier()"
+      (reset)="resetSupplierForm()"
+      (edit)="editSupplier($event)"
+      (delete)="deleteSupplier($event)">
+    </app-suppliers-workspace>
+
+    <app-movements-workspace
+      *ngIf="activeView === 'movements'"
+      [transactionForm]="transactionForm"
+      [products]="products"
+      [transactionSearchTerm]="transactionSearchTerm"
+      [transactionTypeFilter]="transactionTypeFilter"
+      [rows]="filteredTransactionRows"
+      (transactionSearchTermChange)="transactionSearchTerm = $event"
+      (transactionTypeFilterChange)="transactionTypeFilter = $event"
+      (save)="createTransaction()">
+    </app-movements-workspace>
+
+    <section class="panel span-12">
+      <div class="panel-header">
+        <div>
+          <p class="eyebrow">Foundation data</p>
+          <h3>Create inventory nodes</h3>
+        </div>
+      </div>
+
+      <form class="inline-form" (ngSubmit)="saveInventory()">
+        <label class="field compact grow">
+          <span>{{ editingInventoryId ? 'Rename inventory' : 'Location' }}</span>
+          <input [(ngModel)]="inventoryForm.location" name="location" placeholder="Enter inventory location" required />
+        </label>
+        <button type="submit" [disabled]="!hasInventoryLocation">{{ editingInventoryId ? 'Save Inventory' : 'Add Inventory' }}</button>
+        <button *ngIf="editingInventoryId" type="button" class="ghost" (click)="cancelInventoryEdit()">Cancel</button>
+      </form>
+
+      <div class="inventory-strip">
+        <article class="inventory-chip" *ngFor="let inventory of inventories">
+          <strong>{{ inventory.location }}</strong>
+          <div class="inventory-chip-actions">
+            <button type="button" class="ghost small" (click)="editInventory(inventory)">Rename</button>
+            <button type="button" class="ghost small danger" (click)="deleteInventory(inventory)">Delete</button>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+  </ng-container>
+</div>

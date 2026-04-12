@@ -1,0 +1,87 @@
+<section class="panel span-4 form-panel">
+  <div class="panel-header">
+    <div>
+      <p class="eyebrow">Movement desk</p>
+      <h3>Post transaction</h3>
+    </div>
+  </div>
+
+  <form class="form-grid" (ngSubmit)="save.emit()">
+    <label class="field">
+      <span>Product</span>
+      <select [(ngModel)]="transactionForm.productId" name="transactionProductId" required>
+        <option [ngValue]="0">Select product</option>
+        <option *ngFor="let product of products" [ngValue]="product.productId">
+          {{ product.name }} (#{{ product.productId }})
+        </option>
+      </select>
+    </label>
+    <label class="field">
+      <span>Type</span>
+      <select [(ngModel)]="transactionForm.type" name="transactionType" required>
+        <option value="Add">Add</option>
+        <option value="Remove">Remove</option>
+      </select>
+    </label>
+    <label class="field">
+      <span>Quantity</span>
+      <input [(ngModel)]="transactionForm.quantity" name="transactionQuantity" type="number" min="1" required />
+    </label>
+    <div class="actions">
+      <button type="submit">Save Transaction</button>
+    </div>
+  </form>
+</section>
+
+<section class="panel span-8">
+  <div class="panel-header">
+    <div>
+      <p class="eyebrow">Activity feed</p>
+      <h3>Movement history</h3>
+    </div>
+  </div>
+
+  <div class="filters double">
+    <label class="field compact">
+      <span>Search</span>
+      <input [ngModel]="transactionSearchTerm" (ngModelChange)="transactionSearchTermChange.emit($event)" name="transactionSearchTerm" placeholder="Search by product or type" />
+    </label>
+    <label class="field compact">
+      <span>Type</span>
+      <select [ngModel]="transactionTypeFilter" (ngModelChange)="transactionTypeFilterChange.emit($event)" name="transactionTypeFilter">
+        <option value="all">All types</option>
+        <option value="Add">Add</option>
+        <option value="Remove">Remove</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="table-shell">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Product</th>
+          <th>Type</th>
+          <th>Quantity</th>
+          <th>Inventory</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let row of rows">
+          <td>#{{ row.transactionId }}</td>
+          <td>{{ row.productName }}</td>
+          <td>
+            <span class="pill" [class.danger]="row.normalizedType === 'Remove'">
+              {{ row.normalizedType }}
+            </span>
+          </td>
+          <td>{{ row.quantity }}</td>
+          <td>{{ row.inventoryLocation }}</td>
+          <td>{{ row.date | date:'medium' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
