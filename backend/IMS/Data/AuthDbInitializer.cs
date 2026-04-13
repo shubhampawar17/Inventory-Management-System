@@ -6,7 +6,7 @@ namespace IMS.Data
 {
     public static class AuthDbInitializer
     {
-        public static async Task InitializeAsync(IServiceProvider services)
+        public static async Task InitializeAsync(IServiceProvider services, IConfiguration configuration, IWebHostEnvironment environment)
         {
             using var scope = services.CreateScope();
             var context = scope.ServiceProvider.GetRequiredService<InventoryContext>();
@@ -22,7 +22,14 @@ namespace IMS.Data
                 );
                 """);
 
-            var (hash, salt) = PasswordHasher.HashPassword("admin123");
+            if (!ShouldSeedDefaultAdmin(configuration, environment))
+            {
+                return;
+            }
+
+            var username = configuration["AdminSeed:Username"] ?? "admin";
+            var password = configuration["AdminSeed:Password"] ?? "admin123";
+            var (hash, salt) = PasswordHasher.HashPassword(password);
 
             await context.Database.ExecuteSqlRawAsync(
                 """
@@ -30,11 +37,23 @@ namespace IMS.Data
                 VALUES (@username, @passwordhash, @passwordsalt, @isactive, @createdat)
                 ON CONFLICT (username) DO NOTHING;
                 """,
-                new NpgsqlParameter("@username", "admin"),
+                new NpgsqlParameter("@username", username),
                 new NpgsqlParameter("@passwordhash", hash),
                 new NpgsqlParameter("@passwordsalt", salt),
                 new NpgsqlParameter("@isactive", true),
                 new NpgsqlParameter("@createdat", DateTime.Now));
+        }
+
+        private static bool ShouldSeedDefaultAdmin(IConfiguration configuration, IWebHostEnvironment environment)
+        {
+            var configValue = configuration["AdminSeed:Enabled"];
+
+            if (bool.TryParse(configValue, out var enabled))
+            {
+                return enabled;
+            }
+
+            return environment.IsDevelopment();
         }
     }
 }

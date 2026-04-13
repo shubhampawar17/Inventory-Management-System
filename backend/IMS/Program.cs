@@ -3,6 +3,8 @@ using IMS.Repository;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+    ?? ["http://localhost:4200"];
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -17,14 +19,14 @@ builder.Services.AddScoped<TransactionRepository>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AngularClient", policy =>
-        policy.WithOrigins("http://localhost:4200")
+        policy.WithOrigins(allowedOrigins)
             .AllowAnyHeader()
             .AllowAnyMethod());
 });
 
 var app = builder.Build();
 
-await AuthDbInitializer.InitializeAsync(app.Services);
+await AuthDbInitializer.InitializeAsync(app.Services, app.Configuration, app.Environment);
 
 if (app.Environment.IsDevelopment())
 {
