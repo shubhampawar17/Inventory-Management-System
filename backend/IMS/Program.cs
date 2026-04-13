@@ -28,11 +28,8 @@ var app = builder.Build();
 
 await AuthDbInitializer.InitializeAsync(app.Services, app.Configuration, app.Environment);
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseCors("AngularClient");
 app.UseAuthorization();
