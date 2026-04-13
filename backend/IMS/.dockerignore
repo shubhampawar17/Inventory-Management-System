@@ -1,0 +1,8 @@
+bin/
+obj/
+.vs/
+run-verify.err.log
+run-verify.out.log
+bin-verify/
+bin-verify-postgres/
+bin-verify-postgres-auth/
