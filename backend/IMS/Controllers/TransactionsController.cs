@@ -85,9 +85,16 @@ public class TransactionsController : ControllerBase
                 return BadRequest(new { message = "Type must be either 'Add' or 'Remove'." });
             }
 
+            // More robust way to get the created transaction
             var latestTransaction = _transactionRepository.GetAllTransactions()
-                .OrderByDescending(transaction => transaction.TransactionId)
-                .First();
+                .Where(t => t.ProductId == request.ProductId)
+                .OrderByDescending(t => t.Date)
+                .FirstOrDefault();
+
+            if (latestTransaction == null)
+            {
+                return StatusCode(500, new { message = "Transaction was recorded but could not be retrieved." });
+            }
 
             return CreatedAtAction(nameof(GetAll), new TransactionResponse(
                 latestTransaction.TransactionId,
@@ -104,6 +111,16 @@ public class TransactionsController : ControllerBase
         catch (ProductNotFoundException ex)
         {
             return NotFound(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[ERROR] Transaction creation failed: {ex.Message}");
+            Console.WriteLine($"[ERROR] Stack Trace: {ex.StackTrace}");
+            if (ex.InnerException != null)
+            {
+                Console.WriteLine($"[ERROR] Inner Exception: {ex.InnerException.Message}");
+            }
+            return StatusCode(500, new { message = "Internal server error occurred.", detail = ex.Message });
         }
     }
 }
