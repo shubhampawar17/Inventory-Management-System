@@ -1,4 +1,4 @@
-﻿using IMS.Models;
+using IMS.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace IMS.Data
@@ -60,7 +60,9 @@ namespace IMS.Data
                 entity.Property(transaction => transaction.ProductId).HasColumnName("productid");
                 entity.Property(transaction => transaction.Type).HasColumnName("type");
                 entity.Property(transaction => transaction.Quantity).HasColumnName("quantity");
-                entity.Property(transaction => transaction.Date).HasColumnName("date");
+                entity.Property(transaction => transaction.Date)
+                      .HasColumnName("date")
+                      .HasConversion(v => v.ToUniversalTime(), v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
                 entity.Property(transaction => transaction.InventoryId).HasColumnName("inventoryid");
             });
 
@@ -73,7 +75,9 @@ namespace IMS.Data
                 entity.Property(adminUser => adminUser.PasswordHash).HasColumnName("passwordhash");
                 entity.Property(adminUser => adminUser.PasswordSalt).HasColumnName("passwordsalt");
                 entity.Property(adminUser => adminUser.IsActive).HasColumnName("isactive");
-                entity.Property(adminUser => adminUser.CreatedAt).HasColumnName("createdat");
+                entity.Property(adminUser => adminUser.CreatedAt)
+                      .HasColumnName("createdat")
+                      .HasConversion(v => v.ToUniversalTime(), v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
             });
         }
     }
