@@ -53,13 +53,18 @@ namespace IMS.Data
         private static bool ShouldSeedDefaultAdmin(IConfiguration configuration, IWebHostEnvironment environment)
         {
             var configValue = configuration["AdminSeed:Enabled"];
+            Console.WriteLine($"[DB] Configuration 'AdminSeed:Enabled' value: '{configValue}'");
+            Console.WriteLine($"[DB] Environment: '{environment.EnvironmentName}'");
 
             if (bool.TryParse(configValue, out var enabled))
             {
+                Console.WriteLine($"[DB] Parsed Enabled: {enabled}");
                 return enabled;
             }
 
-            return environment.IsDevelopment();
+            var isDev = environment.IsDevelopment();
+            Console.WriteLine($"[DB] Enabled not set or invalid. Falling back to IsDevelopment: {isDev}");
+            return isDev;
         }
     }
 }
