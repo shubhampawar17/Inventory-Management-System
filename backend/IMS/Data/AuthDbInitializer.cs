@@ -48,7 +48,7 @@ namespace IMS.Data
                 new NpgsqlParameter("@passwordhash", hash),
                 new NpgsqlParameter("@passwordsalt", salt),
                 new NpgsqlParameter("@isactive", true),
-                new NpgsqlParameter("@createdat", DateTime.Now));
+                new NpgsqlParameter("@createdat", DateTime.UtcNow));
             
             Console.WriteLine($"[DB] Admin user '{username}' seeded/updated successfully.");
         }

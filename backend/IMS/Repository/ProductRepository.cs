@@ -108,7 +108,7 @@ namespace IMS.Repository
                 ProductId = productId,
                 Quantity = quantity,
                 Type = "Add",
-                Date = DateTime.Now,
+                Date = DateTime.UtcNow,
                 InventoryId = inventoryId
             };
 
@@ -137,7 +137,7 @@ namespace IMS.Repository
                 ProductId = productId,
                 Quantity = quantity,
                 Type = "Remove",
-                Date = DateTime.Now,
+                Date = DateTime.UtcNow,
                 InventoryId = inventoryId
             };
 
