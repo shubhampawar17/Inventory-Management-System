@@ -2,13 +2,14 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
+import { environment } from '../environments/environment';
 import { DashboardSummary, Inventory, InventoryTransaction, LoginResponse, Product, Supplier } from './models';
 
 @Injectable({
   providedIn: 'root'
 })
 export class InventoryApiService {
-  private readonly baseUrl = 'http://localhost:5008/api';
+  private readonly baseUrl = environment.apiBaseUrl;
 
   constructor(private readonly http: HttpClient) {}
 
