@@ -6,10 +6,13 @@ var builder = WebApplication.CreateBuilder(args);
 var corsSection = builder.Configuration.GetSection("Cors:AllowedOrigins");
 var allowedOrigins = corsSection.Get<string[]>() ?? new string[] { "http://localhost:4200" };
 
-// Ensure origins don't have trailing slashes, as it can cause CORS to fail
-allowedOrigins = allowedOrigins.Select(o => o.TrimEnd('/')).ToArray();
+// Ensure origins are strictly cleaned: remove newlines, carriage returns, trailing slashes, and spaces
+allowedOrigins = allowedOrigins
+    .Select(o => o.Replace("\r", "").Replace("\n", "").Trim().TrimEnd('/'))
+    .Where(o => !string.IsNullOrWhiteSpace(o))
+    .ToArray();
 
-Console.WriteLine($"[CORS] Allowed Origins: {string.Join(", ", allowedOrigins)}");
+Console.WriteLine($"[CORS] Allowed Origins (Cleaned): {string.Join(" | ", allowedOrigins)}");
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
