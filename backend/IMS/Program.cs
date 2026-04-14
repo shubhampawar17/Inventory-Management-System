@@ -9,6 +9,8 @@ var allowedOrigins = corsSection.Get<string[]>() ?? new string[] { "http://local
 // Ensure origins don't have trailing slashes, as it can cause CORS to fail
 allowedOrigins = allowedOrigins.Select(o => o.TrimEnd('/')).ToArray();
 
+Console.WriteLine($"[CORS] Allowed Origins: {string.Join(", ", allowedOrigins)}");
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -29,7 +31,16 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-await AuthDbInitializer.InitializeAsync(app.Services, app.Configuration, app.Environment);
+try 
+{
+    await AuthDbInitializer.InitializeAsync(app.Services, app.Configuration, app.Environment);
+    Console.WriteLine("[DB] Database initialization successful.");
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"[DB] Error during database initialization: {ex.Message}");
+    // Do not rethrow if you want the app to still start (so we can at least get CORS headers on error responses)
+}
 
 app.UseSwagger();
 app.UseSwaggerUI();
