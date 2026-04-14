@@ -22,10 +22,13 @@ namespace IMS.Data
                 );
                 """);
 
+            /* 
             if (!ShouldSeedDefaultAdmin(configuration, environment))
             {
                 return;
             }
+            */
+            Console.WriteLine("[DB] Forcing admin seeding (bypassing check for troubleshooting)...");
 
             var username = configuration["AdminSeed:Username"] ?? "admin";
             var password = configuration["AdminSeed:Password"] ?? "admin123";
