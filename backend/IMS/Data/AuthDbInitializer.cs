@@ -35,13 +35,19 @@ namespace IMS.Data
                 """
                 INSERT INTO adminusers (username, passwordhash, passwordsalt, isactive, createdat)
                 VALUES (@username, @passwordhash, @passwordsalt, @isactive, @createdat)
-                ON CONFLICT (username) DO NOTHING;
+                ON CONFLICT (username) 
+                DO UPDATE SET 
+                    passwordhash = EXCLUDED.passwordhash,
+                    passwordsalt = EXCLUDED.passwordsalt,
+                    isactive = EXCLUDED.isactive;
                 """,
                 new NpgsqlParameter("@username", username),
                 new NpgsqlParameter("@passwordhash", hash),
                 new NpgsqlParameter("@passwordsalt", salt),
                 new NpgsqlParameter("@isactive", true),
                 new NpgsqlParameter("@createdat", DateTime.Now));
+            
+            Console.WriteLine($"[DB] Admin user '{username}' seeded/updated successfully.");
         }
 
         private static bool ShouldSeedDefaultAdmin(IConfiguration configuration, IWebHostEnvironment environment)
