@@ -3,8 +3,11 @@ using IMS.Repository;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
-var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
-    ?? ["http://localhost:4200"];
+var corsSection = builder.Configuration.GetSection("Cors:AllowedOrigins");
+var allowedOrigins = corsSection.Get<string[]>() ?? new string[] { "http://localhost:4200" };
+
+// Ensure origins don't have trailing slashes, as it can cause CORS to fail
+allowedOrigins = allowedOrigins.Select(o => o.TrimEnd('/')).ToArray();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
