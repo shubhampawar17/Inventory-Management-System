@@ -577,6 +577,12 @@ td small,
   color: #fbf6ee;
 }
 
+.supplier-card p {
+  margin: 8px 0 12px;
+  color: #a6b6c8;
+  font-size: 0.92rem;
+}
+
 .inventory-chip-actions {
   display: flex;
   gap: 8px;
